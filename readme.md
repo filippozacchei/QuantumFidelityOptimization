@@ -22,8 +22,11 @@ This repository implements a **Bayesian Optimisation (BO) framework** in Julia, 
 
 .
 ├── RealBO.jl         # Main module implementing Bayesian Optimisation
+|
 ├── calibration.jl    # Calibration routines (external functions: Q, ideal, etc.)
+|
 ├── main.jl           # Example script applying RealBO to the calibration problem
+|
 └── README.md         # Project documentation
 
 
