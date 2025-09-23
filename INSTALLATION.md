@@ -12,8 +12,8 @@ This document explains how to set up and run the repository in a **reproducible 
 
 ## Step 1: Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
+git clone git@github.com:filippozacchei/QuantumFidelityOptimization.git
+cd QuantumFidelityOptimization
 ```
 
 ## Step 2: Activate Julia Environment
