@@ -45,8 +45,6 @@ This creates an editable copy of IonSim in:
 ~/.julia/dev/IonSim
 ```
 
-Apply the modification
-
 Navigate to:
 
 ```bash
@@ -62,7 +60,7 @@ Optim.Options(g_tol=1e-6, x_abstol=1e-12, x_reltol=1e-6,
 
 Save the file.
 
-Rebuild IonSim
+### Rebuild IonSim
 
 Back in Julia:
 
@@ -89,7 +87,9 @@ Optim.Options(g_tol=1e-6, x_abstol=1e-12, x_reltol=1e-6,
 
 Execute the main script:
 ```bash
-julia main.jl
+julia
+include("bayes_opt.jl)
+include("main.jl")
 ```
 
 This will:
