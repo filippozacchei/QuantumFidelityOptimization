@@ -71,7 +71,7 @@ using Pkg
 Pkg.build("IonSim")
 ```
 
-Step 4: Verify the Patch
+## Step 4: Verify the Patch
 
 Check that your modification is in place:
 
@@ -85,7 +85,7 @@ Optim.Options(g_tol=1e-6, x_abstol=1e-12, x_reltol=1e-6,
               f_abstol=1e-12, f_reltol=1e-6)
 ```
 
-Step 5: Run the Repository
+## Step 5: Run the Repository
 
 Execute the main script:
 ```bash
