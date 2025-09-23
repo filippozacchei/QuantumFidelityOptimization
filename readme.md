@@ -47,21 +47,7 @@ In detail:
 ---
 
 ## Installation
-Ensure that [Julia](https://julialang.org/) ≥ 1.6 is installed.  
-Required packages:
 
-```julia
-using Pkg
-Pkg.add([
-    "Random",
-    "LinearAlgebra",
-    "Distributions",
-    "Plots",
-    "GaussianProcesses",
-    "Statistics"
-])
-```
-
-Additional Instructions are needed and described in installation.md
+Extensive Instructions are needed and described in installation.md
 
 
