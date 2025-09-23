@@ -19,13 +19,14 @@ This repository implements a **Bayesian Optimisation (BO) framework** in Julia, 
 - Optional animated `.gif` output to track optimisation progress.
 
 ## Repository Structure
-files:
+
+Files:
 - RealBO.jl         Main module implementing Bayesian Optimisation
 - calibration.jl    Calibration routines (external functions: Q, ideal, etc.)
-─ main.jl           Example script applying RealBO to the calibration problem
-─ README.md         Project documentation
+- main.jl           Example script applying RealBO to the calibration problem
+- README.md         Project documentation
 
-
+In detail:
 - **`RealBO.jl`**  
   Contains the `RealBO` module with Bayesian Optimisation routines:
   - `fit_gp!`: Fit a Gaussian Process surrogate.
