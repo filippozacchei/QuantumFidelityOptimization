@@ -8,13 +8,6 @@ using Plots
 using GaussianProcesses
 using Statistics   
 
-# Transparent background for all plots
-default(background_color=:transparent, 
-        foreground_color=:black,  # keep axes/ticks visible
-        legend_background_color=:transparent,
-        guidefontcolor=:white,
-        tickfontcolor=:white)
-
 # ---------------- Utilities ----------------
 
 # HELPERS
@@ -117,57 +110,6 @@ function bayesopt(f; bounds::Vector{Tuple{Float64,Float64}},
 
     # cache true objective on grid
     Ztrue = [f_eval([x,y]) for y in ys, x in xs]
-
-    # # ---- helper: one BO iteration ----
-    # function bo_step(t, X, y)
-    #     display(t)
-    #     # Fit surrogate
-    #     gp, yμ, yσ = fit_gp!(X, y)
-    #     y_std = (y .- yμ) ./ yσ
-    #     fbest_std = maximum(y_std)
-
-    #     # Candidate set
-    #     cand = [ [rand()*(ub[j]-lb[j]) + lb[j] for j in 1:d] for _ in 1:M ]
-    #     cand = [x for x in cand if is_new_point(x, X; tol=0.0)]
-    #     isempty(cand) && (cand = [[rand()*(ub[j]-lb[j]) + lb[j] for j in 1:d] for _ in 1:100])
-
-    #     # Score EI
-    #     vals = [ei(gp, x, fbest_std; xi=xi) for x in cand]
-    #     order = sortperm(vals, rev=true)
-
-    #     # Batch: evaluate top-q
-    #     added = 0; k = 1
-    #     while added < q && k ≤ length(order)
-    #         x_next = cand[order[k]]
-    #         if is_new_point(x_next, X; tol=0.0)
-    #             y_next = f_eval(x_next)
-    #             push!(X, x_next); push!(y, y_next)
-    #             added += 1
-    #         end
-    #         k += 1
-    #     end
-
-    #     # Plot (mean surface if 2D)
-    #     fig = nothing
-    #     if d == 2
-    #         gp, yμ, yσ = fit_gp!(X, y)
-    #         nx = 60; ny = 60
-    #         xs = range(lb[1], ub[1], length=nx)
-    #         ys = range(lb[2], ub[2], length=ny)
-    #         Zμ = [first(gp_predict_f(gp, [x,y])) for y in ys, x in xs]
-    #         Zμ = yμ .+ yσ .* Zμ
-    #         p_mean = surface(xs, ys, Zμ; xlabel="x₁", ylabel="x₂", zlabel="μ(x)",
-    #                          title="Posterior mean (iter $t)", c=:plasma)
-    #         scatter!([X[i][1] for i in 1:length(X)],
-    #                  [X[i][2] for i in 1:length(X)],
-    #                  y; marker=:circle, ms=3, color=:black, label="samples")
-    #         best = accumulate(max, y)
-    #         p_trace = plot(best; xlabel="eval", ylabel="best f(x)", lw=2, color=:orange,
-    #                        title="Best-so-far")
-    #         fig = plot(p_mean, p_trace; layout=(1,2), size=(1100,500))
-    #     end
-    #     return X, y, fig
-    # end
 
     # ---- helper: one BO iteration ----
     function bo_step(t, X, y)
