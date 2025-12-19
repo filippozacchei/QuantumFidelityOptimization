@@ -55,7 +55,7 @@ function ideal(t)
     return [fid, f_cl, f_sb, intensity, delta_phi]
 end
 
-function Q(t, f_cl, f_sb, A, s=1000)
+function Q1(t, f_cl, f_sb, A, s=1000)
     ca = Ca40([("S1/2", -1/2, "S"), ("D5/2", -1/2, "D")])
     laser1 = Laser(pointing=[(1, 1.), (2, 1.)])
     laser2 = Laser(pointing=[(1, 1.), (2, 1.)])
