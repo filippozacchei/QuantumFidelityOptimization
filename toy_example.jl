@@ -1,33 +1,30 @@
-# toy_example.jl
-# Assumes you already defined:
-#   - module RealBO with: bayesopt(...) returning BOResult
-#   - module RealBOPlots with: plot2d(res; ...) and animate2d(res; ...)
-
 using .BayesOpt
 using .BayesOptPlots
 using Plots
+using Random, Distributions
 
-# Toy objective: maximum at (0.3, -0.2), value = 1
-f(x) = 1.0 - (x[1] - 0.3)^2 - (x[2] + 0.2)^2
+σ = 0.01
+f_true(x) = 1 - (x[1]-0.3)^2 - (x[2]+0.2)^2
+f_noisy(x) = f_true(x) + rand(Normal(0, σ))
 
 bounds = [(-1.0, 1.0), (-1.0, 1.0)]
 
-res = BayesOpt.bayesopt(f;
+res, x_rec, y_rec = BayesOpt.bayesopt(f_noisy;
     bounds=bounds,
     n_init=6,
-    n_iter=25,
+    n_iter=100,
     xi=0.01,
     maximize=true,
-    seed=1
+    seed=1,
+    obs_noise=σ
 )
 
-# Best found (from stored evaluations)
 best_idx = argmax(res.y)
-println("Best x = ", res.X[best_idx], "   best y = ", res.y[best_idx])
+x_best = vec(res.X[:, best_idx])
+println("Best observed x = ", x_best, "   best observed y = ", res.y[best_idx])
+println("Recommended (GP-mean) x = ", x_rec, "   recommended y ≈ ", y_rec)
 
-# Plot diagnostics at iteration t=10 (after init)
-display(BayesOptPlots.plot2d(res; t=10, f_true=f))
+display(BayesOptPlots.plot2d(res; f_true=f_true))
 
-# Animate the whole run
-anim, fps = BayesOptPlots.animate2d(res; f_true=f, nx=50, ny=50, fps=10)
+anim, fps = BayesOptPlots.animate2d(res; f_true=f_true, nx=50, ny=50, fps=5)
 gif(anim, "toy_bo.gif", fps=fps)

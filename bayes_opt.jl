@@ -21,7 +21,7 @@ end
     return x
 end
 
-@inline function fit_gp(X::Matrix{Float64}, y::Vector{Float64}; noise_floor=1e-5)
+function fit_gp(X::Matrix{Float64}, y::Vector{Float64}; obs_noise::Union{Nothing,Float64}=nothing)
     # X: d×n
     yμ = mean(y)
     yσ = max(std(y), 1e-12)
@@ -30,10 +30,14 @@ end
     d, n = size(X)
     ℓ0  = fill(0.3, d)
     σf0 = 1.0
-    σn0 = max(noise_floor, 1e-3)
+    σn0 = obs_noise === nothing ? 1e-5 : obs_noise
 
     gp = GP(X, ystd, MeanZero(), Matern(3/2, ℓ0, σf0), σn0)
-    optimize!(gp)
+    if obs_noise === nothing
+        optimize!(gp)              
+    else
+        optimize!(gp; noise=false) 
+    end
     return gp, yμ, yσ
 end
 
@@ -53,10 +57,10 @@ end
     return Δ * cdf(Normal(), γ) + σ * pdf(Normal(), γ)
 end
 
-# -------- main --------
 function bayesopt(f; bounds::Vector{Tuple{Float64,Float64}},
                   n_init::Int=8, n_iter::Int=30, M::Int=2000,
-                  xi::Float64=0.01, maximize::Bool=true, seed=nothing)
+                  xi::Float64=0.01, maximize::Bool=true, seed=nothing,
+                  obs_noise::Union{Nothing,Float64}=nothing)
 
     seed !== nothing && Random.seed!(seed)
 
@@ -66,11 +70,9 @@ function bayesopt(f; bounds::Vector{Tuple{Float64,Float64}},
 
     f_eval = maximize ? f : (x -> -f(x))
 
-    # X as d×n
     X = Matrix{Float64}(undef, d, 0)
     y = Float64[]
 
-    # init
     for _ in 1:n_init
         x = rand_in_box(lb, ub)
         X = hcat(X, x)
@@ -78,11 +80,11 @@ function bayesopt(f; bounds::Vector{Tuple{Float64,Float64}},
     end
 
     for _ in 1:n_iter
-        gp, yμ, yσ = fit_gp(X, y)
+        gp, yμ, yσ = fit_gp(X, y; obs_noise=obs_noise)
+
         y_std = (y .- yμ) ./ yσ
         fbest_std = maximum(y_std)
 
-        # candidates
         best_x = nothing
         best_a = -Inf
         for _ in 1:M
@@ -98,11 +100,24 @@ function bayesopt(f; bounds::Vector{Tuple{Float64,Float64}},
         push!(y, f_eval(best_x))
     end
 
-    best_idx = argmax(y)
-    x_best = vec(X[:, best_idx])
-    y_best = maximize ? y[best_idx] : -y[best_idx]
-    return BOResult(X, maximize ? y : (-y), bounds, n_init, maximize)
+    # recommendation: argmax posterior mean
+    gp, yμ, yσ = fit_gp(X, y; obs_noise=obs_noise)
+    best_x = nothing
+    best_m = -Inf
+    for _ in 1:M
+        x = rand_in_box(lb, ub)
+        μstd, _ = gp_predict_f1(gp, x)
+        μ = yμ + yσ * μstd
+        if μ > best_m
+            best_m = μ
+            best_x = x
+        end
+    end
 
+    res = BOResult(X, maximize ? y : (-y), bounds, n_init, maximize)
+    x_rec = best_x
+    y_rec = maximize ? best_m : -best_m
+    return res, x_rec, y_rec
 end
-
-end # module
+            
+end
