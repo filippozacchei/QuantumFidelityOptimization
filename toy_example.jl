@@ -19,6 +19,7 @@ res, x_rec, y_rec = BayesOpt.bayesopt(f_noisy;
     obs_noise=σ
 )
 
+
 best_idx = argmax(res.y)
 x_best = vec(res.X[:, best_idx])
 println("Best observed x = ", x_best, "   best observed y = ", res.y[best_idx])
